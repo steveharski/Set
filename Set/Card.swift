@@ -6,13 +6,34 @@
 //  Copyright © 2018 Steve Harski. All rights reserved.
 //
 
-import Foundation
+import UIKit
 
-struct Card {
+struct Card: Equatable {
+    
+    static func ==(lhs: Card, rhs: Card) -> Bool {
+        return lhs.identifier == rhs.identifier
+    }
+    
+    var isMatched = false // now sure
+    
+    var symbol: String
+    var shading: String
+    var color: UIColor
+    
+    var identifier: Int
     
     
+    private static var identifierFactory = 0
     
-    init() {
-        
+    private static func getUniqueIdentifier() -> Int {
+        identifierFactory += 1
+        return identifierFactory
+    }
+    
+    init(symbol: String, shading: String, color: UIColor) {
+        self.identifier = Card.getUniqueIdentifier()
+        self.symbol = symbol
+        self.shading = shading
+        self.color = color
     }
 }
