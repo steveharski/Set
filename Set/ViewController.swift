@@ -15,9 +15,21 @@ class ViewController: UIViewController {
     @IBOutlet var cardButtons: [UIButton]!
     
     @IBAction func selectCard(_ sender: UIButton) {
-        sender.layer.borderWidth = 3.0
-        sender.layer.borderColor = UIColor.blue.cgColor
-        sender.layer.cornerRadius = 8.0
+        if let cardNumber = cardButtons.index(of: sender) {
+            let selectedCard = game.cardsDeck[cardNumber]
+            if !game.selectedCards.contains(selectedCard) && game.selectedCards.count < 3 {
+                sender.layer.borderWidth = 3.0
+                sender.layer.borderColor = UIColor.blue.cgColor
+                sender.layer.cornerRadius = 8.0
+            } else {
+                sender.layer.borderWidth = 0.0
+                sender.layer.borderColor = UIColor.white.cgColor
+                sender.layer.cornerRadius = 0.0
+            }
+            game.chooseCard(at: cardNumber)
+        }
+
+        
     }
     
     @IBAction func dealThreeMoreCards(_ sender: UIButton) {
@@ -38,8 +50,8 @@ class ViewController: UIViewController {
     private func updateViewFromModel() {
         for index in cardButtons.indices {
             let button = cardButtons[index]
-            let card = game.cardsDeck[index]
-            if index < 12 {
+            if index < game.playedCards.count {
+                let card = game.playedCards[index]
                 let attributes = getAttributes(shading: card.shading, color: card.color)
                 let attributedText = NSAttributedString(string: card.symbol, attributes: attributes)
                 button.setAttributedTitle(attributedText, for: .normal)
@@ -49,7 +61,7 @@ class ViewController: UIViewController {
             }
         }
     }
-    
+
     let numbers = [1, 2, 3]
     let symbols = ["▲", "●", "■"]
     let shadings =  ["solid", "stripped", "open"]

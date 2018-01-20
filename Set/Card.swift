@@ -14,7 +14,7 @@ struct Card: Equatable {
         return lhs.identifier == rhs.identifier
     }
     
-    var isMatched = false // now sure
+    var isMatched = false // not sure
     
     var symbol: String
     var shading: String
