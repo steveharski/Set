@@ -15,31 +15,48 @@ struct Set {
     private(set) var selectedCards = [Card]()
     private(set) var matchedCards = [Card]()
     
+    
     mutating func chooseCard(at index: Int) {
-        assert(cardsDeck.indices.contains(index), "Set.chooseCard(at index:\(index): chosen index not in the deck")
-        let selectedCard = cardsDeck[index]
-        if !selectedCards.contains(selectedCard) && selectedCards.count < 2 {
-            selectedCards.append(cardsDeck[index])
-        } else if selectedCards.contains(selectedCard) && selectedCards.count < 3 {
+        assert(playedCards.indices.contains(index), "Set.chooseCard(at index:\(index): chosen index not in the played Cards")
+        
+        if selectedCards.count == 3 {
+            selectedCards.removeAll()
+        } else if matchedCards.count == 3 {
+            matchedCards.removeAll()
+        }
+        
+        let selectedCard = playedCards[index]
+        if !selectedCards.contains(selectedCard) && selectedCards.count < 3 {
+            selectedCards.append(selectedCard)
+        }
+        else if selectedCards.contains(selectedCard) && selectedCards.count < 3 {
             // Deselect
             let index = selectedCards.index(of: selectedCard)
             selectedCards.remove(at: index!)
-        } else {
+        }
+        
+        if selectedCards.count == 3 {
             // Check for Set
             let firstComparison = compareQualities(card1: selectedCards[0], card2: selectedCards[1])
-            let secondComparison = compareQualities(card1: selectedCards[0], card2: selectedCard)
-            let thirdComparison = compareQualities(card1: selectedCards[1], card2: selectedCard)
+            let secondComparison = compareQualities(card1: selectedCards[0], card2: selectedCards[2])
+            let thirdComparison = compareQualities(card1: selectedCards[1], card2: selectedCards[2])
             if firstComparison == secondComparison && secondComparison == thirdComparison {
-                print("SET!")
-                // In UI mark with green last 3 cards from matchedCards
-                // Insert 3 new cards into played cards at the the index of matched
-               // playedCards.insert(cardsDeck.removeFirst(), at: playedCards.index(of: selectedCard)!)
-                matchedCards.append(selectedCard)
-                matchedCards.append(selectedCards.removeFirst())
-                matchedCards.append(selectedCards.removeFirst())
-            } else {
-                print("NOT SET!")
-                // In UI mark with red mismatched cards
+                // Set
+                for card in selectedCards {
+                    matchedCards.append(card)
+                    playedCards.remove(at: playedCards.index(of: card)!)
+                }
+                // Deal 3 more cards
+                dealThreeMoreCards()
+                selectedCards.removeAll()
+            }
+        }
+    }
+    
+    mutating func dealThreeMoreCards() {
+        if cardsDeck.count != 0 {
+            for _ in 1...3 {
+                playedCards.append(cardsDeck.removeFirst())
             }
         }
     }

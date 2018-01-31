@@ -15,31 +15,53 @@ class ViewController: UIViewController {
     @IBOutlet var cardButtons: [UIButton]!
     
     @IBAction func selectCard(_ sender: UIButton) {
+        updateViewFromModel()
         if let cardNumber = cardButtons.index(of: sender) {
-            let selectedCard = game.cardsDeck[cardNumber]
-            if !game.selectedCards.contains(selectedCard) && game.selectedCards.count < 3 {
-                sender.layer.borderWidth = 3.0
-                sender.layer.borderColor = UIColor.blue.cgColor
-                sender.layer.cornerRadius = 8.0
-            } else {
-                sender.layer.borderWidth = 0.0
-                sender.layer.borderColor = UIColor.white.cgColor
-                sender.layer.cornerRadius = 0.0
-            }
+            guard (game.playedCards[safe: cardNumber] as Card?) != nil
+                else { return }
             game.chooseCard(at: cardNumber)
-        }
+            
+            for playedCard in game.playedCards {
+                if let playedCardIndex = game.playedCards.index(of: playedCard) {
+                    if game.selectedCards.contains(playedCard) {
+                        if game.selectedCards.count == 3 {
+                            // Mismatch
+                            cardButtons[playedCardIndex].layer.borderWidth = 3.0
+                            cardButtons[playedCardIndex].layer.borderColor = UIColor.red.cgColor
+                            cardButtons[playedCardIndex].layer.cornerRadius = 8.0
+                        } else {
+                            // Selected card
+                            cardButtons[playedCardIndex].layer.borderWidth = 3.0
+                            cardButtons[playedCardIndex].layer.borderColor = UIColor.blue.cgColor
+                            cardButtons[playedCardIndex].layer.cornerRadius = 8.0
+                        }
+                    } else if game.matchedCards.contains(playedCard) {
+                        // Match
+                        cardButtons[playedCardIndex].layer.borderWidth = 3.0
+                        cardButtons[playedCardIndex].layer.borderColor = UIColor.green.cgColor
+                        cardButtons[playedCardIndex].layer.cornerRadius = 8.0
+                    } else {
+                        // Default
+                        cardButtons[playedCardIndex].layer.borderWidth = 0.0
+                        cardButtons[playedCardIndex].layer.borderColor = UIColor.white.cgColor
+                        cardButtons[playedCardIndex].layer.cornerRadius = 0.0
+                    }
+                }
 
-        
+            }
+        }
     }
     
     @IBAction func dealThreeMoreCards(_ sender: UIButton) {
-        print(#function)
+        game.dealThreeMoreCards()
+        updateViewFromModel()
     }
     
     @IBOutlet weak var scoreLabel: UILabel!
     
     @IBAction func startNewGame(_ sender: UIButton) {
-        print(#function)
+        game = Set(numbers: numbers, symbols: symbols, shadings: shadings, colors: colors)
+        updateViewFromModel()
     }
     
     override func viewDidLoad() {
@@ -54,6 +76,7 @@ class ViewController: UIViewController {
                 let card = game.playedCards[index]
                 let attributes = getAttributes(shading: card.shading, color: card.color)
                 let attributedText = NSAttributedString(string: card.symbol, attributes: attributes)
+                button.backgroundColor = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1)
                 button.setAttributedTitle(attributedText, for: .normal)
             } else {
                 button.backgroundColor = #colorLiteral(red: 1, green: 0.5763723254, blue: 0, alpha: 0)
@@ -61,6 +84,7 @@ class ViewController: UIViewController {
             }
         }
     }
+    
 
     let numbers = [1, 2, 3]
     let symbols = ["▲", "●", "■"]
@@ -77,5 +101,11 @@ class ViewController: UIViewController {
         return attributes
     }
     
+}
+
+extension Array {
+    subscript (safe index: Int) -> Element? {
+        return indices ~= index ? self[index] : nil
+    }
 }
 
