@@ -44,19 +44,37 @@ struct Set {
                 // Set
                 for card in selectedCards {
                     matchedCards.append(card)
-                    playedCards.remove(at: playedCards.index(of: card)!)
                 }
-                // Deal 3 more cards
-                dealThreeMoreCards()
                 selectedCards.removeAll()
             }
         }
     }
     
     mutating func dealThreeMoreCards() {
-        if cardsDeck.count != 0 {
+        if !cardsDeck.isEmpty && playedCards.count < 24 {
             for _ in 1...3 {
                 playedCards.append(cardsDeck.removeFirst())
+            }
+        }
+    }
+    
+    mutating func updateAfterMatch() {
+        guard matchedCards.count == 3 else { return }
+        for card in matchedCards {
+            if let playedIndex = playedCards.index(of: card) {
+                if cardsDeck.count > 0 {
+                    playedCards[playedIndex] = cardsDeck.removeFirst()
+                } else {
+                    removeMatchedCardsFromPlayed()
+                }
+            }
+        }
+    }
+    
+    mutating private func removeMatchedCardsFromPlayed() {
+        for card in matchedCards {
+            if playedCards.contains(card) {
+                playedCards.remove(at: playedCards.index(of: card)!)
             }
         }
     }

@@ -17,8 +17,7 @@ class ViewController: UIViewController {
     @IBAction func selectCard(_ sender: UIButton) {
         updateViewFromModel()
         if let cardNumber = cardButtons.index(of: sender) {
-            guard (game.playedCards[safe: cardNumber] as Card?) != nil
-                else { return }
+            guard (game.playedCards[safe: cardNumber] as Card?) != nil else { return }
             game.chooseCard(at: cardNumber)
             
             for playedCard in game.playedCards {
@@ -47,8 +46,8 @@ class ViewController: UIViewController {
                         cardButtons[playedCardIndex].layer.cornerRadius = 0.0
                     }
                 }
-
             }
+            game.updateAfterMatch()
         }
     }
     
